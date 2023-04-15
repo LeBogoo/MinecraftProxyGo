@@ -1,6 +1,7 @@
 package packetUtils
 
 import (
+	"bytes"
 	"minecraftproxy/packetUtils/utils"
 )
 
@@ -20,4 +21,17 @@ func ParsePingRequestPacket(packet Packet) (PingRequestPacket, error) {
 
 	return PingRequestPacket{packet, payload}, nil
 
+}
+
+func (packet PingRequestPacket) ToBytes() ([]byte, error) {
+	packetBuffer := bytes.NewBuffer([]byte{})
+	packetBuffer.Write(utils.ToVarInt(packet.PacketId))
+	packetBuffer.Write(utils.ToLong(packet.Payload))
+
+	packet.PacketLength = len(packetBuffer.Bytes())
+	buffer := bytes.NewBuffer([]byte{})
+	buffer.Write(utils.ToVarInt(packet.PacketLength))
+	buffer.Write(packetBuffer.Bytes())
+
+	return buffer.Bytes(), nil
 }

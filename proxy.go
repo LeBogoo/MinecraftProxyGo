@@ -59,6 +59,20 @@ func handleConnection(conn net.Conn) {
 			conn.Write(bytes)
 		}
 
+		if (state == 1) && (packet.PacketId == 0x01) {
+			fmt.Println("PingPacket")
+			pingPacket, _ := packetUtils.ParsePingRequestPacket(packet)
+			fmt.Println("Payload:", pingPacket.Payload)
+
+			response, _ := pingPacket.ToBytes()
+
+			conn.Write(response)
+			conn.Close()
+			fmt.Println("Connection closed by server")
+			break
+
+		}
+
 		if err != nil {
 			fmt.Println("Error reading:", err)
 			break
