@@ -74,6 +74,20 @@ func handleConnection(conn net.Conn) {
 
 		}
 
+		if (state == 2) && (packet.PacketId == 0x00) {
+			fmt.Println("LoginStartPacket")
+			loginStartPacket, _ := packetUtils.ParseLoginStartPacket(packet)
+			fmt.Println("Username:", loginStartPacket.Name)
+			fmt.Println("UUID:", loginStartPacket.PlayerUUID)
+
+			disconnectPacket := packetUtils.CreateLoginDisconnectPacket("{\"text\":\"Starting...\n\",\"bold\":true,\"color\":\"#00ff00\",\"extra\":[{\"color\":\"white\",\"bold\":false,\"text\":\"The server was offline, but is now starting. Please wait a few econds and try connecting again!\"}]}")
+			response, _ := disconnectPacket.ToBytes()
+			conn.Write(response)
+			conn.Close()
+			fmt.Println("Connection closed by server (LoginStartPacket)")
+			break
+		 }
+
 		if err != nil {
 			fmt.Println("Error reading:", err)
 			break
