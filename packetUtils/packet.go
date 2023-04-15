@@ -12,14 +12,6 @@ type Packet struct {
 	Reader       *bufio.Reader
 }
 
-func (packet Packet) GetPacketLength() int {
-	return packet.PacketLength
-}
-
-func (packet Packet) GetPacketId() int {
-	return packet.PacketId
-}
-
 func (packet Packet) GetReader() *bufio.Reader {
 	return packet.Reader
 }

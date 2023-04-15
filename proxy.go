@@ -19,16 +19,17 @@ func handleConnection(conn net.Conn) {
 	for {
 		packet, err := packetUtils.ParsePacket(reader)
 		fmt.Println("*************************")
-		fmt.Println("PacketLength:", packet.GetPacketLength())
-		fmt.Println("PacketId:", packet.GetPacketId())
+		fmt.Println("PacketLength:", packet.PacketLength)
+		fmt.Println("PacketId:", packet.PacketId)
 		fmt.Println("State:", state)
 
-		if (state == 0) && (packet.GetPacketId() == 0x00) {
+		if (state == 0) && (packet.PacketId == 0x00) {
 			handshakePacket, _ := packetUtils.ParseHandshakePacket(packet)
 			state = handshakePacket.NextState
+			continue
 		}
 
-		if (state == 1) && (packet.GetPacketId() == 0x00) {
+		if (state == 1) && (packet.PacketId == 0x00) {
 			fmt.Println("StatusRequestPacket")
 			response := packetUtils.CreateStatusResponsePacket(
 				packetUtils.StatusResponse{
