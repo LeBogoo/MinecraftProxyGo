@@ -60,19 +60,18 @@ func CreateStatusResponsePacket(statusResponse StatusResponse) StatusResponsePac
 		JSONResponse: append(varIntLength, jsonString...),
 	}
 
-	statusRequestPacket.PacketLength = int(len(statusRequestPacket.JSONResponse) + 1)
 	return statusRequestPacket
 }
 
 func (packet StatusResponsePacket) ToBytes() ([]byte, error) {
-	parentBytes, err := packet.Packet.ToBytes()
+	packetBuffer := bytes.NewBuffer([]byte{})
+	packetBuffer.Write(utils.ToVarInt(packet.PacketId))
+	packetBuffer.Write(packet.JSONResponse)
 
-	if err != nil {
-		return nil, err
-	}
-
-	buffer := bytes.NewBuffer(parentBytes)
-	buffer.Write(packet.JSONResponse)
+	packet.PacketLength = len(packetBuffer.Bytes())
+	buffer := bytes.NewBuffer([]byte{})
+	buffer.Write(utils.ToVarInt(packet.PacketLength))
+	buffer.Write(packetBuffer.Bytes())
 
 	return buffer.Bytes(), nil
 }
