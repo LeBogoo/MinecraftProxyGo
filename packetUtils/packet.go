@@ -17,7 +17,7 @@ func (packet Packet) GetReader() *bufio.Reader {
 }
 
 func ParsePacket(reader *bufio.Reader) (Packet, error) {
-	packetLength, err := utils.ReadInt(reader)
+	packetLength, err := utils.ReadVarInt(reader)
 	if err != nil {
 		return Packet{}, err
 	}
