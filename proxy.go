@@ -17,6 +17,11 @@ func handleConnection(conn net.Conn) {
 	defer conn.Close()
 
 	for {
+		// check if connection is closed
+		if conn == nil {
+			break
+		}
+
 		packet, err := packetUtils.ParsePacket(reader)
 		fmt.Println("*************************")
 		fmt.Println("PacketLength:", packet.PacketLength)
