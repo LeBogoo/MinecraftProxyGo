@@ -15,5 +15,6 @@ func ReadString(reader *bufio.Reader, length int) (string, error) {
 }
 
 func ToString(value string) []byte {
-	return []byte(value)
+	length := ToVarInt(len(value))
+	return append(length, []byte(value)...)
 }
