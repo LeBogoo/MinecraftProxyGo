@@ -6,7 +6,6 @@ import (
 	"net"
 
 	"minecraftproxy/packetUtils"
-	"minecraftproxy/packetUtils/utils"
 )
 
 func handleConnection(conn net.Conn) {
@@ -18,65 +17,51 @@ func handleConnection(conn net.Conn) {
 	defer conn.Close()
 
 	for {
-		packet, _ := packetUtils.ParsePacket(reader)
+		packet, err := packetUtils.ParsePacket(reader)
 		fmt.Println("*************************")
 		fmt.Println("PacketLength:", packet.GetPacketLength())
 		fmt.Println("PacketId:", packet.GetPacketId())
 		fmt.Println("State:", state)
 
-		if state == 0 && packet.GetPacketId() == 0x00 {
-			fmt.Println("------------------------\nHandshakePacket detected\n-                      -")
+		if (state == 0) && (packet.GetPacketId() == 0x00) {
 			handshakePacket, _ := packetUtils.ParseHandshakePacket(packet)
-			fmt.Println("ProtocolVersion:", handshakePacket.ProtocolVersion)
-			fmt.Println("ServerAddress:", handshakePacket.ServerAddress)
-			fmt.Println("ServerPort:", handshakePacket.ServerPort)
-			fmt.Println("NextState:", handshakePacket.NextState)
-
-			state = 1
-
-			continue
+			state = handshakePacket.NextState
 		}
 
-		if state == 1 && packet.GetPacketId() == 0x00 {
-			fmt.Println("------------------------\nStatusRequestPacket detected\n-                      -")
-			fmt.Println("No data in StatusRequestPacket")
+		if (state == 1) && (packet.GetPacketId() == 0x00) {
+			fmt.Println("StatusRequestPacket")
+			response := packetUtils.CreateStatusResponsePacket(
+				packetUtils.StatusResponse{
+					Version: packetUtils.Version{
+						Name:     "1.19.3",
+						Protocol: 761,
+					},
+					Players: packetUtils.Players{
+						Max:    100,
+						Online: 0,
+						Sample: []packetUtils.Sample{},
+					},
+					Description: packetUtils.Description{
+						Text: "This is not a Minecraft server, it is just a program written in Go.",
+					},
+					Favicon:            "",
+					EnforcesSecureChat: false,
+				},
+			)
 
-			packetId := utils.ToVarInt(0x00)
-			response := utils.ToString("{\"enforcesSecureChat\":false,\"description\":{\"color\":\"green\",\"text\":\"LeBogo Community Server\"},\"players\":{\"max\":20,\"online\":0},\"version\":{\"name\":\"Paper 1.19.3\",\"protocol\":761}}")
-			packetLength := utils.ToVarInt(len(packetId) + len(response))
+			bytes, err := response.ToBytes()
 
-			var responsePacket = append(packetLength, packetId...)
-
-			responsePacket = append(responsePacket, response...)
-
-			_, err := conn.Write(responsePacket)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println("Error converting packet to bytes:", err)
+				break
 			}
 
-			continue
+			conn.Write(bytes)
 		}
 
-		if state == 1 && packet.GetPacketId() == 0x01 {
-			fmt.Println("------------------------\nPingRequestPacket detected\n-                      -")
-			pingPacket, _ := packetUtils.ParsePingRequestPacket(packet)
-			fmt.Println("PingPacket:", pingPacket)
-
-			packetId := utils.ToVarInt(0x01)
-			payload := utils.ToLong(pingPacket.Payload)
-			packetLength := utils.ToVarInt(len(packetId) + len(payload))
-
-			var responsePacket = append(packetLength, packetId...)
-			responsePacket = append(responsePacket, payload...)
-
-			_, err := conn.Write(responsePacket)
-			if err != nil {
-				fmt.Println(err)
-			}
-
-			conn.Close()
-
-			return
+		if err != nil {
+			fmt.Println("Error reading:", err)
+			break
 		}
 	}
 }

@@ -2,6 +2,7 @@ package packetUtils
 
 import (
 	"bufio"
+	"bytes"
 	"minecraftproxy/packetUtils/utils"
 )
 
@@ -35,4 +36,12 @@ func ParsePacket(reader *bufio.Reader) (Packet, error) {
 	}
 
 	return Packet{packetLength, packetId, reader}, nil
+}
+
+func (packet Packet) ToBytes() ([]byte, error) {
+	buffer := bytes.NewBuffer([]byte{})
+	buffer.Write(utils.ToVarInt(packet.PacketLength))
+	buffer.Write(utils.ToVarInt(packet.PacketId))
+
+	return buffer.Bytes(), nil
 }
