@@ -1,7 +1,8 @@
 {
   "server": {
     "host": "localhost",
-    "port": 25565
+    "port": 25565,
+    "protocol": 761
   },
   "proxy_port": 25566,
   "starting_disconnect_message": "Server is currently starting...\nPlease wait a few seconds.",

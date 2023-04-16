@@ -47,6 +47,26 @@ func ParseStatusRequestPacket(packet Packet) (StatusRequestPacket, error) {
 	return StatusRequestPacket{packet}, nil
 }
 
+func ParseStatusResponsePacket(packet Packet) (StatusResponsePacket, error) {
+	reader := packet.GetReader()
+
+	statusJsonLength, _ := utils.ReadVarInt(reader)
+	statusJSON, _ := utils.ReadString(reader, statusJsonLength)
+
+	return StatusResponsePacket{packet, []byte(statusJSON)}, nil
+}
+
+func CreateStatusRequestPacket() StatusRequestPacket {
+	statusRequestPacket := StatusRequestPacket{
+		Packet: Packet{
+			PacketLength: 0,
+			PacketId:     0x00,
+		},
+	}
+
+	return statusRequestPacket
+}
+
 func CreateStatusResponsePacket(statusResponse StatusResponse) StatusResponsePacket {
 	jsonString, _ := json.Marshal(statusResponse)
 	jsonLength := len(jsonString)
@@ -61,6 +81,18 @@ func CreateStatusResponsePacket(statusResponse StatusResponse) StatusResponsePac
 	}
 
 	return statusRequestPacket
+}
+
+func (packet StatusRequestPacket) ToBytes() ([]byte, error) {
+	packetBuffer := bytes.NewBuffer([]byte{})
+	packetBuffer.Write(utils.ToVarInt(packet.PacketId))
+
+	packet.PacketLength = len(packetBuffer.Bytes())
+	buffer := bytes.NewBuffer([]byte{})
+	buffer.Write(utils.ToVarInt(packet.PacketLength))
+	buffer.Write(packetBuffer.Bytes())
+
+	return buffer.Bytes(), nil
 }
 
 func (packet StatusResponsePacket) ToBytes() ([]byte, error) {

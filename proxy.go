@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"minecraftproxy/config"
+	"minecraftproxy/networking"
 	"minecraftproxy/packetUtils"
 )
 
@@ -36,32 +37,18 @@ func handleConnection(conn net.Conn, config *config.Config) {
 
 		if (state == 1) && (packet.PacketId == 0x00) {
 			fmt.Println("StatusRequestPacket")
-			response := packetUtils.CreateStatusResponsePacket(
-				packetUtils.StatusResponse{
-					Version: packetUtils.Version{
-						Name:     "1.19.3",
-						Protocol: 761,
-					},
-					Players: packetUtils.Players{
-						Max:    100,
-						Online: 0,
-						Sample: []packetUtils.Sample{},
-					},
-					Description: packetUtils.Description{
-						Text: "This is not a Minecraft server, it is just a program written in Go.",
-					},
-					Favicon:            "",
-					EnforcesSecureChat: false,
-				},
-			)
 
-			bytes, err := response.ToBytes()
+			statusResponse, err := networking.StatusPingServer(&config.Server)
+			var response packetUtils.StatusResponsePacket
 
 			if err != nil {
-				fmt.Println("Error converting packet to bytes:", err)
-				break
+				response = packetUtils.CreateStatusResponsePacket(config.OfflineStatusResponse)
+			} else {
+				response = packetUtils.CreateStatusResponsePacket(statusResponse)
+
 			}
 
+			bytes, _ := response.ToBytes()
 			conn.Write(bytes)
 		}
 
@@ -85,7 +72,7 @@ func handleConnection(conn net.Conn, config *config.Config) {
 			fmt.Println("Username:", loginStartPacket.Name)
 			fmt.Println("UUID:", loginStartPacket.PlayerUUID)
 
-			disconnectPacket := packetUtils.CreateLoginDisconnectPacket("{\"text\":\"Starting...\n\",\"bold\":true,\"color\":\"#00ff00\",\"extra\":[{\"color\":\"white\",\"bold\":false,\"text\":\"The server was offline, but is now starting. Please wait a few econds and try connecting again!\"}]}")
+			disconnectPacket := packetUtils.CreateLoginDisconnectPacket("{\"text\":\"Starting...\n\",\"bold\":true,\"color\":\"#00ff00\",\"extra\":[{\"color\":\"white\",\"bold\":false,\"text\":\"" + config.StartingDisconnectMessage + "\"}]}")
 			response, _ := disconnectPacket.ToBytes()
 			conn.Write(response)
 			conn.Close()

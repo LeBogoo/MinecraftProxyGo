@@ -10,6 +10,18 @@ type PingRequestPacket struct {
 	Payload int64
 }
 
+func CreatePingRequestPacket() PingRequestPacket {
+	pingRequestPacket := PingRequestPacket{
+		Packet: Packet{
+			PacketLength: 0,
+			PacketId:     0x01,
+		},
+		Payload: 0,
+	}
+
+	return pingRequestPacket
+}
+
 func ParsePingRequestPacket(packet Packet) (PingRequestPacket, error) {
 	reader := packet.GetReader()
 
