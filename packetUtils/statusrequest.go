@@ -24,7 +24,8 @@ type StatusResponse struct {
 }
 
 type Description struct {
-	Text string `json:"text"`
+	Text  string `json:"text"`
+	Color string `json:"color"`
 }
 
 type Players struct {
