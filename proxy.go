@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"net"
 
+	"minecraftproxy/config"
 	"minecraftproxy/packetUtils"
 )
 
-func handleConnection(conn net.Conn) {
-
+func handleConnection(conn net.Conn, config *config.Config) {
 	state := 0
 
 	reader := bufio.NewReader(conn)
@@ -91,7 +91,7 @@ func handleConnection(conn net.Conn) {
 			conn.Close()
 			fmt.Println("Connection closed by server (LoginStartPacket)")
 			break
-		 }
+		}
 
 		if err != nil {
 			fmt.Println("Error reading:", err)
@@ -101,6 +101,8 @@ func handleConnection(conn net.Conn) {
 }
 
 func main() {
+	config := config.LoadConfig("config.json")
+
 	ln, err := net.Listen("tcp", ":25566")
 	if err != nil {
 		fmt.Println("Error listening:", err)
@@ -115,6 +117,6 @@ func main() {
 			continue
 		}
 		fmt.Println("~~~~~~~~~\nClient connected\n~~~~~~~~~")
-		go handleConnection(conn)
+		go handleConnection(conn, &config)
 	}
 }

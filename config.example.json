@@ -1,0 +1,40 @@
+{
+  "server": {
+    "host": "localhost",
+    "port": 25565
+  },
+  "proxy_port": 25566,
+  "starting_disconnect_message": "Server is currently starting...\nPlease wait a few seconds.",
+  "offline_status_response": {
+    "version": {
+      "name": "1.19.3",
+      "protocol": 761
+    },
+    "players": {
+      "max": 1,
+      "online": 0,
+      "sample": []
+    },
+    "description": {
+      "text": "Currently offline. Join to start the Server!"
+    },
+    "favicon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACEUExURRcXFxwXFycWFlsWF/8QFZoUF/8RFf8QFKMUF6YTFusSFscSFYkUFfURFjoVFX8UFnkUFfISFrQTFs8SFW4VFlgVF9cSFfcRFXsVFt8RFCYXF48UFTgWFiUXF/oSFkQWGPESFqEUF5MUFlQWFxsWFhoYGMgSFcMTFrwTFiAWFiMXFxkXF602BAAAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAFxSURBVFhH7ZbrjoIwEIULrRXwgoJW0Yr3+/u/386U0UBYBHST3U36/aBT5swJKW2mzGKx/AMcl3DoRVu4IDi9aMtHBh0pZZfqRRcmHUo0xaPaJx4lmuEHkuqeyMCnZBN6VFWgR8km/LZB3xtQTYGB1ydBHQFVlAhIUMEwDMMRBpnBOIrNCMTR2IzGYASyIQYlJiCRGGQGUX4nRmY0BviDJxiUmCqlYs4dYzBTPp+rBMsSNee+mhkDh/MYZFMqKeMKsTAGSxYKxTQaaKZEyJbGYCGES9LvWaXpWm9Au9U7keg9Gux1InZ6C9FGr9N0RdJKSps4j1mjGuDskboEnE8SveJwrN4HxwOJXlNtQII6Hga5Rcxoa5D7jRltDaQ6ceCkHqva1kCIFKcpTd4xEBFAIfCGQRFr0NzgXG4riAzOJKjn475wkfgN0FOxMOuyUl4o2QxsroWz0K65/oDBFW42N3bHC86d3eB5pYTFYvmbMPYFn3IZFzXw5LwAAAAASUVORK5CYII=",
+    "enforcesSecureChat": false
+  },
+  "starting_status_response": {
+    "version": {
+      "name": "1.19.3",
+      "protocol": 761
+    },
+    "players": {
+      "max": 0,
+      "online": 0,
+      "sample": []
+    },
+    "description": {
+      "text": "Server is currently starting...\nPlease wait a few seconds."
+    },
+    "favicon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAACEUExURRcXFxwbFyckFltQFv/WEJqDFP/XEf/XEKOLFKaNE+vGEsepEol2FPXOETo0FX9tFHlpFPLMErSZE8+wEm5gFVhMFde2EvfQEXtrFd+9ESYkF498FDgzFiUjF/rTEkQ7FvHMEqGJFJN+FFRKFhsaFhoaGMiqEsOmE7ygEyAeFiMhFxkZF6cSIO8AAAAJcEhZcwAADsIAAA7CARUoSoAAAAFxSURBVFhH7ZbrjoIwEIULrRXwgoJW0Yr3+/u/386U0UBYBHST3U36/aBT5swJKW2mzGKx/AMcl3DoRVu4IDi9aMtHBh0pZZfqRRcmHUo0xaPaJx4lmuEHkuqeyMCnZBN6VFWgR8km/LZB3xtQTYGB1ydBHQFVlAhIUMEwDMMRBpnBOIrNCMTR2IzGYASyIQYlJiCRGGQGUX4nRmY0BviDJxiUmCqlYs4dYzBTPp+rBMsSNee+mhkDh/MYZFMqKeMKsTAGSxYKxTQaaKZEyJbGYCGES9LvWaXpWm9Au9U7keg9Gux1InZ6C9FGr9N0RdJKSps4j1mjGuDskboEnE8SveJwrN4HxwOJXlNtQII6Hga5Rcxoa5D7jRltDaQ6ceCkHqva1kCIFKcpTd4xEBFAIfCGQRFr0NzgXG4riAzOJKjn475wkfgN0FOxMOuyUl4o2QxsroWz0K65/oDBFW42N3bHC86d3eB5pYTFYvmbMPYFn3IZFzXw5LwAAAAASUVORK5CYII=",
+    "enforcesSecureChat": false
+  }
+}
