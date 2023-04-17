@@ -3,6 +3,7 @@ package packetUtils
 import (
 	"bytes"
 	"encoding/json"
+	"minecraftproxy/minecraft"
 	"minecraftproxy/packetUtils/utils"
 )
 
@@ -16,16 +17,11 @@ type StatusResponsePacket struct {
 }
 
 type StatusResponse struct {
-	Version            Version     `json:"version"`
-	Players            Players     `json:"players"`
-	Description        Description `json:"description"`
-	Favicon            string      `json:"favicon"`
-	EnforcesSecureChat bool        `json:"enforcesSecureChat"`
-}
-
-type Description struct {
-	Text  string `json:"text"`
-	Color string `json:"color"`
+	Version            Version        `json:"version"`
+	Players            Players        `json:"players"`
+	Description        minecraft.Text `json:"description"`
+	Favicon            string         `json:"favicon"`
+	EnforcesSecureChat bool           `json:"enforcesSecureChat"`
 }
 
 type Players struct {

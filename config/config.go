@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"minecraftproxy/minecraft"
 	"minecraftproxy/packetUtils"
 	"os"
 )
@@ -14,12 +15,22 @@ type Server struct {
 	Protocol int    `json:"protocol"`
 }
 
+type StatusResponses struct {
+	Offline  packetUtils.StatusResponse `json:"offline"`
+	Starting packetUtils.StatusResponse `json:"starting"`
+}
+
+type DisconnectMessages struct {
+	NowStarting minecraft.Text `json:"now_starting"`
+	Starting    minecraft.Text `json:"starting"`
+}
+
 type Config struct {
-	Server                    Server                     `json:"server"`
-	ProxyPort                 int                        `json:"proxy_port"`
-	StartingDisconnectMessage string                     `json:"starting_disconnect_message"`
-	OfflineStatusResponse     packetUtils.StatusResponse `json:"offline_status_response"`
-	StartingStatusResponse    packetUtils.StatusResponse `json:"starting_status_response"`
+	Server             Server             `json:"server"`
+	ApproxStartupTime  int                `json:"approx_startup_time"`
+	ProxyPort          int                `json:"proxy_port"`
+	StatusResponses    StatusResponses    `json:"status_responses"`
+	DisconnectMessages DisconnectMessages `json:"disconnect_messages"`
 }
 
 func LoadConfig(filename string) Config {

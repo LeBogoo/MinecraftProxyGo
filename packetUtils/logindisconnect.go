@@ -2,6 +2,8 @@ package packetUtils
 
 import (
 	"bytes"
+	"encoding/json"
+	"minecraftproxy/minecraft"
 	"minecraftproxy/packetUtils/utils"
 )
 
@@ -10,13 +12,15 @@ type LoginDisconnectPacket struct {
 	Reason string
 }
 
-func CreateLoginDisconnectPacket(reason string) LoginDisconnectPacket {
+func CreateLoginDisconnectPacket(reason minecraft.Text) LoginDisconnectPacket {
+	jsonText, _ := json.Marshal(reason)
+
 	return LoginDisconnectPacket{
 		Packet: Packet{
 			PacketLength: 0,
 			PacketId:     0x00,
 		},
-		Reason: reason,
+		Reason: string(jsonText),
 	}
 }
 

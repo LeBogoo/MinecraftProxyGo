@@ -10,8 +10,9 @@ import (
 	"minecraftproxy/packetUtils"
 )
 
-func handleConnection(conn net.Conn, config *config.Config) {
+func handleConnection(conn net.Conn, globalState *config.State) {
 	state := 0
+	config := globalState.Config
 
 	reader := bufio.NewReader(conn)
 
@@ -41,11 +42,12 @@ func handleConnection(conn net.Conn, config *config.Config) {
 			statusResponse, err := networking.StatusPingServer(&config.Server)
 			var response packetUtils.StatusResponsePacket
 
-			if err != nil {
-				response = packetUtils.CreateStatusResponsePacket(config.OfflineStatusResponse)
+			if err != nil && !globalState.Starting {
+				response = packetUtils.CreateStatusResponsePacket(config.StatusResponses.Offline)
+			} else if err != nil && globalState.Starting {
+				response = packetUtils.CreateStatusResponsePacket(config.StatusResponses.Starting)
 			} else {
 				response = packetUtils.CreateStatusResponsePacket(statusResponse)
-
 			}
 
 			bytes, _ := response.ToBytes()
@@ -72,9 +74,24 @@ func handleConnection(conn net.Conn, config *config.Config) {
 			fmt.Println("Username:", loginStartPacket.Name)
 			fmt.Println("UUID:", loginStartPacket.PlayerUUID)
 
-			disconnectPacket := packetUtils.CreateLoginDisconnectPacket("{\"text\":\"Starting...\n\",\"bold\":true,\"color\":\"#00ff00\",\"extra\":[{\"color\":\"white\",\"bold\":false,\"text\":\"" + config.StartingDisconnectMessage + "\"}]}")
-			response, _ := disconnectPacket.ToBytes()
-			conn.Write(response)
+			_, err := networking.StatusPingServer(&config.Server)
+
+			var response []byte
+
+			if err != nil && !globalState.Starting { // server is offline and not starting. tell the player that the server is now starting
+				globalState.Starting = true
+				// TODO: start server -> wake on lan
+				disconnectPacket := packetUtils.CreateLoginDisconnectPacket(config.DisconnectMessages.NowStarting)
+				response, _ = disconnectPacket.ToBytes()
+				conn.Write(response)
+			} else if err != nil && globalState.Starting { // if there is an error (offline) and it is starting tell the player
+				disconnectPacket := packetUtils.CreateLoginDisconnectPacket(config.DisconnectMessages.Starting)
+				response, _ = disconnectPacket.ToBytes()
+				conn.Write(response)
+			} else { // no error, server is online
+				fmt.Println("Server is online. Start proxying...")
+				// TODO: stop loop and start proxying (don't forget to send handshake and login start packet)
+			}
 			conn.Close()
 			fmt.Println("Connection closed by server (LoginStartPacket)")
 			break
@@ -88,7 +105,10 @@ func handleConnection(conn net.Conn, config *config.Config) {
 }
 
 func main() {
-	config := config.LoadConfig("config.json")
+	globalState := config.State{
+		Starting: false,
+		Config:   config.LoadConfig("config.json"),
+	}
 
 	ln, err := net.Listen("tcp", ":25566")
 	if err != nil {
@@ -104,6 +124,6 @@ func main() {
 			continue
 		}
 		fmt.Println("~~~~~~~~~\nClient connected\n~~~~~~~~~")
-		go handleConnection(conn, &config)
+		go handleConnection(conn, &globalState)
 	}
 }
