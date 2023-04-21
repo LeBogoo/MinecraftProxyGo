@@ -1,6 +1,7 @@
 package packetUtils
 
 import (
+	"bytes"
 	"math"
 	"minecraftproxy/packetUtils/utils"
 )
@@ -28,4 +29,36 @@ func ParseLoginStartPacket(packet Packet) (LoginStartPacket, error) {
 
 	return LoginStartPacket{packet, name, playerUUID}, nil
 
+}
+
+func CreateLoginStartPacket(name string, uuid string) LoginStartPacket {
+	loginStartPacket := LoginStartPacket{
+		Packet: Packet{
+			PacketLength: 0,
+			PacketId:     0x00,
+		},
+		Name:       name,
+		PlayerUUID: uuid,
+	}
+
+	return loginStartPacket
+}
+
+func (packet LoginStartPacket) ToBytes() ([]byte, error) {
+	packetBuffer := bytes.NewBuffer([]byte{})
+	packetBuffer.Write(utils.ToVarInt(packet.PacketId))
+	packetBuffer.Write(utils.ToString(packet.Name))
+	if packet.PlayerUUID != "" {
+		packetBuffer.Write(utils.ToBool(true))
+		packetBuffer.Write(utils.ToUUID(packet.PlayerUUID))
+	} else {
+		packetBuffer.Write(utils.ToBool(false))
+	}
+
+	packet.PacketLength = len(packetBuffer.Bytes())
+	buffer := bytes.NewBuffer([]byte{})
+	buffer.Write(utils.ToVarInt(packet.PacketLength))
+	buffer.Write(packetBuffer.Bytes())
+
+	return buffer.Bytes(), nil
 }

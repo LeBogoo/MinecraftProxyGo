@@ -14,3 +14,8 @@ func ReadUUID(reader *bufio.Reader) (string, error) {
 
 	return hex.EncodeToString(bytes), nil
 }
+
+func ToUUID(uuid string) []byte {
+	bytes, _ := hex.DecodeString(uuid)
+	return bytes
+}

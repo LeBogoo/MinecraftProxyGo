@@ -13,6 +13,8 @@ import (
 func handleConnection(conn net.Conn, globalState *config.State) {
 	state := 0
 	config := globalState.Config
+	playing := false
+	var username, uuid string
 
 	reader := bufio.NewReader(conn)
 
@@ -73,6 +75,8 @@ func handleConnection(conn net.Conn, globalState *config.State) {
 			loginStartPacket, _ := packetUtils.ParseLoginStartPacket(packet)
 			fmt.Println("Username:", loginStartPacket.Name)
 			fmt.Println("UUID:", loginStartPacket.PlayerUUID)
+			username = loginStartPacket.Name
+			uuid = loginStartPacket.PlayerUUID
 
 			_, err := networking.StatusPingServer(&config.Server)
 
@@ -90,7 +94,8 @@ func handleConnection(conn net.Conn, globalState *config.State) {
 				conn.Write(response)
 			} else { // no error, server is online
 				fmt.Println("Server is online. Start proxying...")
-				// TODO: stop loop and start proxying (don't forget to send handshake and login start packet)
+				playing = true
+				break
 			}
 			conn.Close()
 			fmt.Println("Connection closed by server (LoginStartPacket)")
@@ -101,6 +106,30 @@ func handleConnection(conn net.Conn, globalState *config.State) {
 			fmt.Println("Error reading:", err)
 			break
 		}
+
+		if playing {
+			break
+		}
+	}
+
+	if playing {
+		fmt.Println("Start proxying...")
+		server, err := net.Dial("tcp", fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port))
+		if err != nil {
+			fmt.Println("Error connecting to server:", err)
+			return
+		}
+
+		fmt.Println(username, uuid)
+		handshakePacket := packetUtils.CreateHandshakePacket(config.Server.Protocol, config.Server.Host, config.Server.Port, 2)
+		bytes, _ := handshakePacket.ToBytes()
+		server.Write(bytes)
+
+		loginStartPacket := packetUtils.CreateLoginStartPacket(username, uuid)
+		bytes, _ = loginStartPacket.ToBytes()
+		server.Write(bytes)
+
+		networking.StartProxying(&conn, &server)
 	}
 }
 
