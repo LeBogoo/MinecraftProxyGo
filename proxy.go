@@ -151,6 +151,8 @@ func main() {
 	}
 	defer ln.Close()
 
+	fmt.Printf("Proxy is now listening on port %d\n-------------------------------------\n", globalState.Config.ProxyPort)
+
 	for {
 		conn, err := ln.Accept()
 		if err != nil {
