@@ -1,4 +1,7 @@
 {
+    "wakeonlan": {
+        "mac": "00:00:00:00:00:00"
+    },
     "server": {
         "host": "localhost",
         "port": 25565,

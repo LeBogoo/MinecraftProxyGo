@@ -25,7 +25,12 @@ type DisconnectMessages struct {
 	Starting    minecraft.Text `json:"starting"`
 }
 
+type WakeOnLan struct {
+	Mac string `json:"mac"`
+}
+
 type Config struct {
+	WakeOnLan          WakeOnLan          `json:"wakeonlan"`
 	Server             Server             `json:"server"`
 	ApproxStartupTime  int                `json:"approx_startup_time"`
 	ProxyPort          int                `json:"proxy_port"`

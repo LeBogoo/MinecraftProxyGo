@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"net"
+	"os/exec"
 
 	"minecraftproxy/config"
 	"minecraftproxy/networking"
@@ -84,7 +85,10 @@ func handleConnection(conn net.Conn, globalState *config.State) {
 
 			if err != nil && !globalState.Starting { // server is offline and not starting. tell the player that the server is now starting
 				globalState.Starting = true
-				// TODO: start server -> wake on lan
+
+				fmt.Println("Waking up server...")
+				exec.Command("wakeonlan", globalState.Config.WakeOnLan.Mac).Start()
+
 				disconnectPacket := packetUtils.CreateLoginDisconnectPacket(config.DisconnectMessages.NowStarting)
 				response, _ = disconnectPacket.ToBytes()
 				conn.Write(response)
@@ -94,6 +98,7 @@ func handleConnection(conn net.Conn, globalState *config.State) {
 				conn.Write(response)
 			} else { // no error, server is online
 				fmt.Println("Server is online. Start proxying...")
+				globalState.Starting = false
 				playing = true
 				break
 			}
