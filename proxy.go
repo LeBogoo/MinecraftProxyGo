@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"net"
-	"os/exec"
 
 	"minecraftproxy/config"
 	"minecraftproxy/networking"
@@ -87,8 +86,7 @@ func handleConnection(conn net.Conn, globalState *config.State) {
 				globalState.Starting = true
 
 				fmt.Println("Waking up server...")
-				cmd := exec.Command("wakeonlan", globalState.Config.WakeOnLan.Mac)
-				err := cmd.Start()
+				err := networking.WakeOnLAN(config.WakeOnLan.Mac)
 				if err != nil {
 					fmt.Println("Error waking up server:", err)
 					globalState.Config.StatusResponses.Offline.Description.Text = "Error starting up server. Please contact an administrator."
