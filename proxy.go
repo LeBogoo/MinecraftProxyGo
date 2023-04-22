@@ -144,7 +144,7 @@ func main() {
 		Config:   config.LoadConfig("config.json"),
 	}
 
-	ln, err := net.Listen("tcp", ":25566")
+	ln, err := net.Listen("tcp", fmt.Sprintf(":%d", globalState.Config.ProxyPort))
 	if err != nil {
 		fmt.Println("Error listening:", err)
 		return
