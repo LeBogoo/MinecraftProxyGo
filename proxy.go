@@ -87,7 +87,17 @@ func handleConnection(conn net.Conn, globalState *config.State) {
 				globalState.Starting = true
 
 				fmt.Println("Waking up server...")
-				exec.Command("wakeonlan", globalState.Config.WakeOnLan.Mac).Start()
+				cmd := exec.Command("wakeonlan", globalState.Config.WakeOnLan.Mac)
+				err := cmd.Start()
+				if err != nil {
+					fmt.Println("Error waking up server:", err)
+					globalState.Config.StatusResponses.Offline.Description.Text = "Error starting up server. Please contact an administrator."
+					globalState.Config.StatusResponses.Offline.Players.Max = -1
+
+					config.DisconnectMessages.NowStarting.Text = "Error starting up server. Please contact an administrator."
+					config.DisconnectMessages.NowStarting.Color = "red"
+					globalState.Starting = false
+				}
 
 				disconnectPacket := packetUtils.CreateLoginDisconnectPacket(config.DisconnectMessages.NowStarting)
 				response, _ = disconnectPacket.ToBytes()
