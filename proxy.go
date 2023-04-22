@@ -27,13 +27,21 @@ func handleConnection(conn net.Conn, globalState *config.State) {
 		}
 
 		packet, err := packetUtils.ParsePacket(reader)
+
+		if err != nil {
+			return
+		}
+
 		fmt.Println("*************************")
 		fmt.Println("PacketLength:", packet.PacketLength)
 		fmt.Println("PacketId:", packet.PacketId)
 		fmt.Println("State:", state)
 
 		if (state == 0) && (packet.PacketId == 0x00) {
-			handshakePacket, _ := packetUtils.ParseHandshakePacket(packet)
+			handshakePacket, err := packetUtils.ParseHandshakePacket(packet)
+			if err != nil {
+				return
+			}
 			state = handshakePacket.NextState
 			continue
 		}
@@ -58,7 +66,10 @@ func handleConnection(conn net.Conn, globalState *config.State) {
 
 		if (state == 1) && (packet.PacketId == 0x01) {
 			fmt.Println("PingPacket")
-			pingPacket, _ := packetUtils.ParsePingRequestPacket(packet)
+			pingPacket, err := packetUtils.ParsePingRequestPacket(packet)
+			if err != nil {
+				return
+			}
 			fmt.Println("Payload:", pingPacket.Payload)
 
 			response, _ := pingPacket.ToBytes()
@@ -72,17 +83,20 @@ func handleConnection(conn net.Conn, globalState *config.State) {
 
 		if (state == 2) && (packet.PacketId == 0x00) {
 			fmt.Println("LoginStartPacket")
-			loginStartPacket, _ := packetUtils.ParseLoginStartPacket(packet)
+			loginStartPacket, err := packetUtils.ParseLoginStartPacket(packet)
+			if err != nil {
+				return
+			}
 			fmt.Println("Username:", loginStartPacket.Name)
 			fmt.Println("UUID:", loginStartPacket.PlayerUUID)
 			username = loginStartPacket.Name
 			uuid = loginStartPacket.PlayerUUID
 
-			_, err := networking.StatusPingServer(&config.Server)
+			_, statusErr := networking.StatusPingServer(&config.Server)
 
 			var response []byte
 
-			if err != nil && !globalState.Starting { // server is offline and not starting. tell the player that the server is now starting
+			if statusErr != nil && !globalState.Starting { // server is offline and not starting. tell the player that the server is now starting
 				globalState.Starting = true
 
 				fmt.Println("Waking up server...")
